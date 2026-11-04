@@ -21,18 +21,25 @@
 //!
 //! 当你准备好后，取消 src/main.rs 中相应行的注释，并在终端中
 //! 运行 `cargo run --bin jira-wip`！
-use super::store_recap::{TicketStore, Status, TicketDraft, TicketPatch, TicketTitle, TicketDescription};
 use super::id_generation::TicketId;
+use super::store_recap::{
+    Status, TicketDescription, TicketDraft, TicketPatch, TicketStore, TicketTitle,
+};
 use std::error::Error;
+use std::fmt::{format, Formatter};
 use std::str::FromStr;
-use std::fmt::Formatter;
 
 #[derive(structopt::StructOpt, Clone)]
 /// 一个用于与玩具版 Jira 克隆 IronJira 交互的小型命令行接口。
 pub enum Command {
     /// 在你的看板上创建一个工单。
     Create {
-        __
+        /// 标题
+        #[structopt(long)]
+        title: TicketTitle,
+        /// 描述
+        #[structopt(long)]
+        description: TicketDescription,
     },
     /// 编辑现有工单的详细信息。
     Edit {
@@ -51,7 +58,9 @@ pub enum Command {
     },
     /// 通过工单 id 从存储中删除一个工单。
     Delete {
-        __
+        /// 你想删除的工单 id
+        #[structopt(long)]
+        ticket_id: TicketId,
     },
     /// 列出所有现有工单。
     List,
@@ -66,23 +75,39 @@ impl FromStr for Status {
     type Err = ParsingError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        __
+        match s.to_lowercase().trim() {
+            "todo" => Ok(Status::ToDo),
+            "inprogress" => Ok(Status::InProgress),
+            "blocked" => Ok(Status::Blocked),
+            "done" => Ok(Status::Done),
+            _ => Err(ParsingError("invalid status".to_string())),
+        }
     }
 }
 
 impl FromStr for TicketTitle {
-    __
+    type Err = ParsingError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TicketTitle::new(s.to_string())
+            .map_err(|err| ParsingError(format!("invalid ticket title: {}", err)))
+    }
 }
 
 impl FromStr for TicketDescription {
-    __
+    type Err = ParsingError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TicketDescription::new(s.to_string())
+            .map_err(|err| ParsingError(format!("invalid ticket description: {}", err)))
+    }
 }
 
 /// 用于解析失败的错误结构体。
 #[derive(Debug)]
 pub struct ParsingError(String);
 
-impl Error for ParsingError { }
+impl Error for ParsingError {}
 
 impl std::fmt::Display for ParsingError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -97,10 +122,15 @@ impl std::fmt::Display for ParsingError {
 /// `dyn Error` 是 trait 对象的语法，这是一个更高级的主题，本工作坊不会涉及。
 /// 如果你好奇，可以查看 Rust 书中的相关章节：
 /// https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types
-pub fn handle_command(ticket_store: &mut TicketStore, command: Command) -> Result<(), Box<dyn Error>> {
+pub fn handle_command(
+    ticket_store: &mut TicketStore,
+    command: Command,
+) -> Result<(), Box<dyn Error>> {
     match command {
         Command::Create { description, title } => {
-            todo!()
+            let draft = TicketDraft { title, description };
+            let id = ticket_store.save(draft);
+            println!("Saved, id: {}", id);
         }
         Command::Edit {
             id,
@@ -108,7 +138,11 @@ pub fn handle_command(ticket_store: &mut TicketStore, command: Command) -> Resul
             description,
             status,
         } => {
-            todo!()
+            let patch = TicketPatch { title, description, status, };
+            match ticket_store.update(&id, patch) {
+                Some(ticket) => println!("Updated, ticket:\n{:#?}", ticket),
+                None => println!("Cannot update, maybe id {} is incorrect", id),
+            }
         }
         Command::Delete { ticket_id } => match ticket_store.delete(&ticket_id) {
             Some(deleted_ticket) => println!(
@@ -121,7 +155,16 @@ pub fn handle_command(ticket_store: &mut TicketStore, command: Command) -> Resul
             ),
         },
         Command::List => {
-            todo!()
+            let tickets = ticket_store.list();
+            if tickets.len() == 0 {
+                println!("No tickets");
+                return Ok(());
+            }
+
+            println!("Tickets:");
+            for ticket in tickets {
+                println!("{:?}", ticket);
+            }
         }
     }
     Ok(())
@@ -132,8 +175,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn invalid_status_fails_to_be_parsed()
-    {
+    fn invalid_status_fails_to_be_parsed() {
         let invalid_status = "Not a good status";
         assert!(Status::from_str(invalid_status).is_err());
     }
