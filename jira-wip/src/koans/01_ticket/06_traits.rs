@@ -1,26 +1,26 @@
 use crate::path_to_enlightenment::visibility::ticket::Status;
 
-/// You might have noticed that in the test for the previous koan we haven't checked if
-/// the status returned by `.status()` matched the status we passed to `create_ticket`.
+/// 你可能已经注意到，在上一个 koan 的测试中，我们没有检查
+/// `.status()` 返回的状态是否与传给 `create_ticket` 的状态一致。
 ///
-/// That's because `assert_eq!(ticket.status(), Status::ToDo)` would have failed to compiled:
+/// 这是因为 `assert_eq!(ticket.status(), Status::ToDo)` 会编译失败：
 ///
 /// error[E0369]: binary operation `==` cannot be applied to type `&path_to_enlightenment::visibility::ticket::Status`
 ///    --> jira-wip/src/koans/01_ticket/05_ownership.rs:128:13
-///    |
+///     |
 /// 128 |             assert_eq!(ticket.status(), Status::ToDo);
-///    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-///    |             |
-///    |             &path_to_enlightenment::visibility::ticket::Status
-///    |             path_to_enlightenment::visibility::ticket::Status
-///    |
-///    = note: an implementation of `std::cmp::PartialEq` might be missing for `&path_to_enlightenment::visibility::ticket::Status`
+///     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+///     |             |
+///     |             &path_to_enlightenment::visibility::ticket::Status
+///     |             path_to_enlightenment::visibility::ticket::Status
+///     |
+///     = note: an implementation of `std::cmp::PartialEq` might be missing for `&path_to_enlightenment::visibility::ticket::Status`
 ///
-/// `assert_eq` requires that its arguments implement the `PartialEq` trait.
-/// What is a trait?
-/// Traits in Rust are very similar to interfaces in other programming languages:
-/// a trait describes a behaviour/capability.
-/// For example:
+/// `assert_eq` 要求它的参数实现 `PartialEq` trait。
+/// 什么是 trait？
+/// Rust 中的 trait 与其他编程语言中的接口非常相似：
+/// trait 描述一种行为/能力。
+/// 例如：
 ///
 /// ```
 /// pub trait Pay {
@@ -28,9 +28,8 @@ use crate::path_to_enlightenment::visibility::ticket::Status;
 /// }
 /// ```
 ///
-/// In practical terms, a trait defines the signature of a collection of methods.
-/// To implement a trait, a struct or an enum have to implement those methods
-/// in an `impl Trait` block:
+/// 实际上，trait 定义了一组方法的签名。
+/// 要实现一个 trait，struct 或 enum 必须在 `impl Trait` 块中实现这些方法：
 ///
 /// ```
 /// impl Pay for TaxPayer {
@@ -40,20 +39,20 @@ use crate::path_to_enlightenment::visibility::ticket::Status;
 /// }
 /// ```
 ///
-/// `PartialEq` is the trait that powers the == operator.
-/// Its definition looks something like this (simplified):
+/// `PartialEq` 就是支撑 == 运算符的 trait。
+/// 它的定义大致如下（简化版）：
 /// ```
 /// pub trait PartialEq {
 ///     fn eq(&self, other: &Self) -> bool
 /// }
 /// ```
-/// It's slightly more complicated, with generic parameters, to allow comparing different types.
-/// But let's roll with this simplified version for now.
+/// 实际定义会稍微复杂一些，带有泛型参数，以允许比较不同的类型。
+/// 不过现在我们先使用这个简化版本。
 ///
-/// Let's implement it for Status!
+/// 让我们为 Status 实现它！
 impl PartialEq for Status {
     fn eq(&self, other: &Status) -> bool {
-        // If you need to refresh the `match` syntax, checkout
+        // 如果你需要复习 `match` 语法，请查看
         // https://doc.rust-lang.org/book/ch06-02-match.html
         match (self, other) {
             __
@@ -67,7 +66,7 @@ mod tests {
 
     #[test]
     fn test_equality() {
-        // Your goal is to make this test compile.
+        // 你的目标是让这个测试编译通过。
         assert_eq!(Status::ToDo == Status::ToDo, true);
         assert_eq!(Status::Done == Status::ToDo, false);
         assert_eq!(Status::InProgress == Status::ToDo, false);

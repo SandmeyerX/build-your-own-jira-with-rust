@@ -1,8 +1,8 @@
-/// We have come quite a long way now: from how to define a struct to traits and derive macros,
-/// touching on tests, module system, visibility, ownership and method syntax.
-/// Take a deep breath, stretch a bit, review what we have done.
+/// 我们已经走了很长一段路：从如何定义 struct 到 trait 和派生宏，
+/// 还涉及了测试、模块系统、可见性、所有权和方法语法。
+/// 深呼吸一下，伸展一下身体，回顾一下我们做过的事情。
 ///
-/// Then get ready to dive in the next section!
+/// 然后准备好进入下一节！
 
 #[derive(PartialEq, Debug)]
 pub enum Status {
