@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 struct TicketStore {
     data: HashMap<TicketId, Ticket>,
-    current_id: TicketId,
+    current_id: TicketId,  
 }
 
 /// 当我们取回之前保存的工单时，希望同时拿到一些元数据：
@@ -30,7 +30,12 @@ impl TicketStore {
 
     pub fn save(&mut self, ticket: Ticket) -> TicketId {
         let id = self.generate_id();
-        self.data.insert(id, ticket);
+        let ticket = Ticket { 
+            datetime: Some(Utc::now()), 
+            id: Some(id),
+            ..ticket
+        };
+        self.data.insert(id, ticket);        
         id
     }
 
@@ -49,6 +54,8 @@ pub struct Ticket {
     title: String,
     description: String,
     status: Status,
+    datetime: Option<DateTime<Utc>>,
+    id: Option<TicketId>,
 }
 
 impl Ticket {
@@ -65,13 +72,13 @@ impl Ticket {
     }
 
     // 工单保存到存储中时的日期时间（如果已保存）。
-    pub fn created_at(&self) -> __ {
-        todo!()
+    pub fn created_at(&self) -> Option<&DateTime<Utc>> {
+        self.datetime.as_ref()
     }
 
     // 工单保存到存储中时关联的 id（如果已保存）。
-    pub fn id(&self) -> __ {
-        todo!()
+    pub fn id(&self) -> Option<&TicketId> {
+        self.id.as_ref()
     }
 }
 
@@ -90,6 +97,8 @@ pub fn create_ticket(title: String, description: String, status: Status) -> Tick
         title,
         description,
         status,
+        datetime: None,
+        id: None,
     }
 }
 

@@ -18,6 +18,7 @@ pub type TicketId = u32;
 // 欢迎给 `TicketStore` 添加更多字段来解决这个练习！
 struct TicketStore {
     data: HashMap<TicketId, Ticket>,
+    last_id: TicketId,
 }
 
 impl TicketStore {
@@ -25,6 +26,7 @@ impl TicketStore {
     {
         TicketStore {
             data: HashMap::new(),
+            last_id: 0,
         }
     }
 
@@ -54,8 +56,10 @@ impl TicketStore {
         self.data.get(id)
     }
 
-    fn generate_id(__) -> TicketId {
-        todo!()
+    fn generate_id(&mut self) -> TicketId {
+        let last_id = self.last_id + 1;
+        self.last_id = last_id;
+        last_id
     }
 }
 

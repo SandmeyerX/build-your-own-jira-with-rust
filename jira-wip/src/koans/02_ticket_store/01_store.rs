@@ -40,11 +40,11 @@ impl TicketStore {
     /// 我们接收 `&mut self`，因为我们将要修改 HashMap，以插入一个新的
     /// 键值对。
     pub fn save(&mut self, ticket: Ticket, id: u32) {
-        todo!()
+        self.data.insert(id, ticket);
     }
 
     pub fn get(&self, id: &u32) -> &Ticket {
-        todo!()
+        self.data.get(id).unwrap()
     }
 }
 

@@ -43,7 +43,7 @@ impl TicketStore {
     /// `HashMap` 的 Rust 文档也会很有用：
     /// https://doc.rust-lang.org/std/collections/struct.HashMap.html
     pub fn list(&self) -> Vec<&Ticket> {
-        todo!()
+        self.data.values().collect()
     }
 
     fn generate_id(&mut self) -> TicketId {

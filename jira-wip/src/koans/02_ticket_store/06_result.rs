@@ -55,10 +55,10 @@ impl TicketDraft {
             return Err(ValidationError("Title cannot be empty!".to_string()));
         }
         if title.len() > 50 {
-            todo!()
+            return Err(ValidationError("Title length cannot be longer than fifty".to_string()));
         }
         if description.len() > 3000 {
-            todo!()
+            return Err(ValidationError("Description length cannot be longer than 3000".to_string()));
         }
 
         let draft = TicketDraft { title, description };

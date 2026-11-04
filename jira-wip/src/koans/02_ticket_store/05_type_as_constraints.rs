@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use chrono::{DateTime, Utc};
-use super::recap::Status;
 use super::id_generation::TicketId;
+use super::recap::Status;
+use chrono::{DateTime, Utc};
+use std::collections::HashMap;
 
 /// 我们知道，在工单被保存之前，id 和创建时间永远不会存在；
 /// 而在调用 `save` 之后，它们则总会被填充。
@@ -33,12 +33,17 @@ use super::id_generation::TicketId;
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct TicketDraft {
-    __
+    title: String,
+    description: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Ticket {
-    __
+    title: String,
+    description: String,
+    status: Status,
+    id: TicketId,
+    created_at: DateTime<Utc>,
 }
 
 struct TicketStore {
@@ -47,16 +52,14 @@ struct TicketStore {
 }
 
 impl TicketStore {
-    pub fn new() -> TicketStore
-    {
+    pub fn new() -> TicketStore {
         TicketStore {
             data: HashMap::new(),
             current_id: 0,
         }
     }
 
-    pub fn save(&mut self, draft: TicketDraft) -> TicketId
-    {
+    pub fn save(&mut self, draft: TicketDraft) -> TicketId {
         let id = self.generate_id();
 
         // 我们可以在这里使用 `Ticket` 的“原始”构造函数，因为
@@ -67,7 +70,11 @@ impl TicketStore {
         // 这强化了我们期望的不变量：把草稿保存到存储中
         // 是“创建” `Ticket` 的唯一方式。
         let ticket = Ticket {
-
+            title: draft.title,
+            description: draft.description,
+            status: Status::ToDo,
+            id,
+            created_at: Utc::now(),
         };
         self.data.insert(id, ticket);
         id
@@ -84,16 +91,30 @@ impl TicketStore {
 }
 
 impl TicketDraft {
-    pub fn title(&self) -> &String { todo!() }
-    pub fn description(&self) -> &String { todo!() }
+    pub fn title(&self) -> &String {
+        &self.title
+    }
+    pub fn description(&self) -> &String {
+        &self.description
+    }
 }
 
 impl Ticket {
-    pub fn title(&self) -> &String { todo!() }
-    pub fn description(&self) -> &String { todo!() }
-    pub fn status(&self) -> &Status { todo!() }
-    pub fn created_at(&self) -> &DateTime<Utc> { todo!() }
-    pub fn id(&self) -> &TicketId { todo!() }
+    pub fn title(&self) -> &String {
+        &self.title
+    }
+    pub fn description(&self) -> &String {
+        &self.description
+    }
+    pub fn status(&self) -> &Status {
+        &self.status
+    }
+    pub fn created_at(&self) -> &DateTime<Utc> {
+        &self.created_at
+    }
+    pub fn id(&self) -> &TicketId {
+        &self.id
+    }
 }
 
 pub fn create_ticket_draft(title: String, description: String) -> TicketDraft {
@@ -107,20 +128,16 @@ pub fn create_ticket_draft(title: String, description: String) -> TicketDraft {
         panic!("A description cannot be longer than 3000 characters!");
     }
 
-    TicketDraft {
-        title,
-        description,
-    }
+    TicketDraft { title, description }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fake::{Faker, Fake};
+    use fake::{Fake, Faker};
 
     #[test]
-    fn a_ticket_with_a_home()
-    {
+    fn a_ticket_with_a_home() {
         let draft = generate_ticket_draft();
         let mut store = TicketStore::new();
 
@@ -134,8 +151,7 @@ mod tests {
     }
 
     #[test]
-    fn a_missing_ticket()
-    {
+    fn a_missing_ticket() {
         let ticket_store = TicketStore::new();
         let ticket_id = Faker.fake();
 
@@ -143,8 +159,7 @@ mod tests {
     }
 
     #[test]
-    fn id_generation_is_monotonic()
-    {
+    fn id_generation_is_monotonic() {
         let n_tickets = 100;
         let mut store = TicketStore::new();
 
