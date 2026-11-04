@@ -1,13 +1,13 @@
-/// It has been our pleasure to have you at the Rust London Code Dojo!
+/// 很高兴你能参加 Rust London Code Dojo！
 ///
-/// We hope that the workshop helped you move forward in your Rust journey,
-/// having fun toying around with rebuilding JIRA.
+/// 我们希望这次工作坊能帮助你在 Rust 之旅中更进一步，
+/// 并在重建 JIRA 的过程中玩得开心。
 ///
-/// If you have any feedback on the workshop, please reach out to rust@lpalmieri.com
-/// If you found any typo, mistake or you think a section could be worded better,
-/// please open a PR!
+/// 如果你对工作坊有任何反馈，请联系 rust@lpalmieri.com
+/// 如果你发现任何拼写错误、错误，或者认为某一部分可以表述得更好，
+/// 请提交 PR！
 ///
-/// ~ See you next time! ~
+/// ~ 下次见！ ~
 ///
 #[cfg(test)]
 mod the_end {

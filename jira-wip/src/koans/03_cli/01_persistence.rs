@@ -1,50 +1,50 @@
-//! Playing around with the CLI using `cargo run --bin jira-wip` you might have noticed
-//! that is quite tricky to actually exercise all the functionality we implemented:
-//! the store is created anew for every execution, nothing is persisted!
+//! 使用 `cargo run --bin jira-wip` 把玩 CLI 时，你可能已经注意到
+//! 要真正演练我们实现的全部功能其实相当棘手：
+//! 每次执行都会重新创建存储，什么都没有被持久化！
 //!
-//! Time to put a remedy to that: we want to persist our store to disk between CLI invocations,
-//! reloading it before performing the next command.
+//! 是时候解决这个问题了：我们希望在多次 CLI 调用之间把存储持久化到磁盘，
+//! 并在执行下一条命令之前重新加载它。
 //!
-//! We will be relying on the `serde` crate (`Ser`ialisation/`De`serialisation):
-//! it can serialise data to many different file formats as long as your struct or enums
-//! implement serde's `Serialize` trait.
-//! `Deserialize`, instead, is needed for the opposite journey.
+//! 我们将依赖 `serde` crate（`Ser`ialisation/`De`serialisation，即序列化/反序列化）：
+//! 只要你的结构体或枚举实现了 serde 的 `Serialize` trait，
+//! 它就可以把数据序列化成许多不同的文件格式。
+//! 而反方向的旅程则需要 `Deserialize`。
 //!
-//! You don't need to implement this manually: just add `#[derive(Serialize, Deserialize)]`
-//! where needed in `store_recap` - the `load` and `save` functions should just work afterwards!
+//! 你不需要手动实现这些：只需在 `store_recap` 中需要的地方加上
+//! `#[derive(Serialize, Deserialize)]`——之后 `load` 和 `save` 函数就应该能直接工作！
 //!
-//! Update `src/main.rs` appropriately afterwards to use the fruit of your labor!
+//! 随后适当地更新 `src/main.rs`，用上你的劳动成果！
 use super::store_recap::TicketStore;
 use std::fs::read_to_string;
 use std::path::Path;
 
-/// Fetch authentication parameters from a configuration file, if available.
+/// 如果存在配置文件，则从中获取认证参数。
 pub fn load(path: &Path) -> TicketStore {
     println!("Reading data from {:?}", path);
-    // Read the data in memory, storing the value in a string
+    // 将数据读入内存，并把值存到一个字符串中
     match read_to_string(path) {
         Ok(data) => {
-            // Deserialize configuration from YAML format
+            // 从 YAML 格式反序列化配置
             serde_yaml::from_str(&data).expect("Failed to parse serialised data.")
         }
         Err(e) => match e.kind() {
-            // The file is missing - this is the first time you are using IronJira!
+            // 文件不存在——这是你第一次使用 IronJira！
             std::io::ErrorKind::NotFound => {
-                // Return default configuration
+                // 返回默认配置
                 TicketStore::new()
             }
-            // Something went wrong - crash the CLI with an error message.
+            // 出了点问题——带着错误信息让 CLI 崩溃。
             _ => panic!("Failed to read data."),
         },
     }
 }
 
-/// Save tickets on disk in the right file.
+/// 将工单保存到磁盘上的正确文件中。
 pub fn save(ticket_store: &TicketStore, path: &Path) {
-    // Serialize data to YAML format
+    // 将数据序列化为 YAML 格式
     let content = serde_yaml::to_string(ticket_store).expect("Failed to serialize tickets");
     println!("Saving tickets to {:?}", path);
-    // Save to disk
+    // 保存到磁盘
     std::fs::write(path, content).expect("Failed to write tickets to disk.")
 }
 
@@ -63,9 +63,9 @@ mod tests {
         let draft = generate_ticket_draft();
         store.save(draft);
 
-        // We use the `tempfile` crate to generate a temporary path on the fly
-        // which will be cleaned up at the end of the test.
-        // See https://docs.rs/tempfile/3.1.0/tempfile/ for more details.
+        // 我们使用 `tempfile` crate 即时生成一个临时路径，
+        // 它会在测试结束时被清理。
+        // 更多细节见 https://docs.rs/tempfile/3.1.0/tempfile/。
         let temp_path = NamedTempFile::new().unwrap().into_temp_path();
 
         save(&store, temp_path.as_ref());
