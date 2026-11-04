@@ -3,31 +3,30 @@ use chrono::{DateTime, Utc};
 use super::recap::Status;
 use super::id_generation::TicketId;
 
-/// We know that id and creation time will never be there before a ticket is saved,
-/// while they will always be populated after `save` has been called.
+/// 我们知道，在工单被保存之前，id 和创建时间永远不会存在；
+/// 而在调用 `save` 之后，它们则总会被填充。
 ///
-/// The approach we followed in the previous koan has its limitations: every time we
-/// access `id` and `created_at` we need to keep track of the "life stage" of our ticket.
-/// Has it been saved yet? Is it safe to unwrap those `Option`s?
-/// That is unnecessary cognitive load and leads to errors down the line,
-/// when writing new code or refactoring existing functionality.
+/// 我们在上一个练习中采用的方法有其局限性：每次访问 `id` 和 `created_at` 时，
+/// 我们都需要跟踪工单所处的“生命周期阶段”。
+/// 它已经被保存了吗？对这些 `Option` 进行 unwrap 安全吗？
+/// 这是不必要的认知负担，并且会在后续编写新代码或重构现有功能时导致错误。
 ///
-/// We can do better.
-/// We can use types to better model our domain and constrain the behaviour of our code.
+/// 我们可以做得更好。
+/// 我们可以使用类型来更好地建模我们的领域，并约束代码的行为。
 ///
-/// Before `TicketStore::save` is called, we are dealing with a `TicketDraft`.
-/// No `created_at`, no `id`, no `status`.
-/// On the other side, `TicketStore::get` will return a `Ticket`, with a `created_at` and
-/// an `id`.
+/// 在调用 `TicketStore::save` 之前，我们处理的是 `TicketDraft`。
+/// 没有 `created_at`，没有 `id`，没有 `status`。
+/// 另一方面，`TicketStore::get` 会返回一个 `Ticket`，其中包含 `created_at` 和
+/// `id`。
 ///
-/// There will be no way to create a `Ticket` without passing through the store:
-/// we will enforce `save` as the only way to produce a `Ticket` from a `TicketDraft`.
-/// This will ensure as well that all tickets start in a `ToDo` status.
+/// 不经过存储就无法创建 `Ticket`：
+/// 我们将强制 `save` 成为从 `TicketDraft` 生成 `Ticket` 的唯一方式。
+/// 这也会确保所有工单都从 `ToDo` 状态开始。
 ///
-/// Less room for errors, less ambiguity, you can understand the domain constraints
-/// by looking at the signatures of the functions in our code.
+/// 更少出错空间，更少歧义，你可以通过查看代码中函数的签名
+/// 来理解领域约束。
 ///
-/// On the topic of type-driven development, checkout:
+/// 关于类型驱动开发这一主题，可以查看：
 /// - https://fsharpforfunandprofit.com/series/designing-with-types.html
 /// - https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/
 /// - https://www.youtube.com/watch?v=PLFl95c-IiU
@@ -60,13 +59,13 @@ impl TicketStore {
     {
         let id = self.generate_id();
 
-        // We can use the "raw" constructor for `Ticket` here because the
-        // store is defined in the same module of `Ticket`.
-        // If you are importing `Ticket` from another module,
-        // `TicketStore::get` will indeed be the only way to get your hands on
-        // an instance of `Ticket`.
-        // This enforces our desired invariant: saving a draft in the store
-        // is the only way to "create" a `Ticket`.
+        // 我们可以在这里使用 `Ticket` 的“原始”构造函数，因为
+        // 存储与 `Ticket` 定义在同一个模块中。
+        // 如果你从另一个模块导入 `Ticket`，
+        // `TicketStore::get` 确实会是拿到
+        // `Ticket` 实例的唯一方式。
+        // 这强化了我们期望的不变量：把草稿保存到存储中
+        // 是“创建” `Ticket` 的唯一方式。
         let ticket = Ticket {
 
         };

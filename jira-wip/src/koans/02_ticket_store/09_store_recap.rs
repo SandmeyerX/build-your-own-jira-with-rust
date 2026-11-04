@@ -1,10 +1,9 @@
-//! The core work is now complete: we have implemented the functionality we wanted to have in
-//! our JIRA clone.
+//! 核心工作现在已完成：我们已经实现了希望在 JIRA 克隆版中拥有的功能。
 //!
-//! Nonetheless, we still can't probe our system interactively: there is no user interface.
-//! That will be the focus of the next (and last) section.
+//! 尽管如此，我们仍然无法交互式地探测我们的系统：没有用户界面。
+//! 这将是下一节（也是最后一节）的重点。
 //!
-//! Take your time to review what you did - you have come a long way!
+//! 花点时间回顾一下你所做的工作——你已经走了很长的路！
 use super::id_generation::TicketId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

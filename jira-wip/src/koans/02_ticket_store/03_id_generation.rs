@@ -1,22 +1,21 @@
 use std::collections::HashMap;
 use super::recap::Ticket;
 
-/// Let's define a type-alias for our ticket id.
-/// It's a lightweight technique to add a semantic layer to the underlying data type.
+/// 让我们为工单 id 定义一个类型别名。
+/// 这是一种轻量级技术，用于给底层数据类型添加一层语义。
 ///
-/// The underlying type remains `u32`.
-/// This remains valid code:
+/// 底层类型仍然是 `u32`。
+/// 下面这段代码仍然有效：
 /// ```
 /// let number: u32 = 1;
 /// let ticket_id: TicketId = number;
 /// ```
-/// If we want to be sure we aren't mixing up ticket ids and `u32` variables with
-/// a different semantic meaning, we would have to create a new type,
-/// e.g. `struct TicketId(u32)`.
-/// For now this doesn't feel necessary - we don't have many `u32`s flying around.
+/// 如果我们想确保不会把工单 id 和具有不同语义的 `u32` 变量混用，
+/// 就需要创建一个新类型，例如 `struct TicketId(u32)`。
+/// 目前这似乎没有必要——我们身边没有那么多 `u32` 在飞来飞去。
 pub type TicketId = u32;
 
-// Feel free to add more fields to `TicketStore` to solve this koan!
+// 欢迎给 `TicketStore` 添加更多字段来解决这个练习！
 struct TicketStore {
     data: HashMap<TicketId, Ticket>,
 }
@@ -29,21 +28,21 @@ impl TicketStore {
         }
     }
 
-    /// So far we have taken the `id` as one the parameters of our `save` method.
+    /// 到目前为止，我们一直把 `id` 作为 `save` 方法的一个参数。
     ///
-    /// What happens when you call save passing two different tickets with the same id?
-    /// We have enforced with a test our expectation: the second ticket overwrites the first.
-    /// The other option would have been to error out.
+    /// 当你传入两个具有相同 id 的不同工单并调用 save 时，会发生什么？
+    /// 我们已经用一个测试固定了期望：第二个工单会覆盖第一个工单。
+    /// 另一种选择本应是报错。
     ///
-    /// This isn't how JIRA works: you don't get to choose the id of your ticket,
-    /// it's generated for you and its uniqueness is guaranteed.
-    /// There is also another peculiarity: ids are integers and they are monotonically
-    /// increasing (the first ticket on a board will be `BOARDNAME-1`, the second
-    /// `BOARDNAME-2` and so on).
+    /// 但 JIRA 并不是这样工作的：你不能选择工单的 id，
+    /// 它是由系统为你生成的，并且其唯一性有保证。
+    /// 还有另一个特点：id 是整数，并且是单调递增的
+    /// （看板上的第一个工单会是 `BOARDNAME-1`，第二个是
+    /// `BOARDNAME-2`，依此类推）。
     ///
-    /// We want the same behaviour in our clone, IronJira.
-    /// `TicketStore` will take care of generating an id for our ticket and the id
-    /// will be returned by `save` after insertion.
+    /// 我们希望我们的克隆版 IronJira 也具有相同的行为。
+    /// `TicketStore` 会负责为我们的工单生成 id，并且该 id
+    /// 会在插入后由 `save` 返回。
     pub fn save(&mut self, ticket: Ticket) -> TicketId
     {
         let id = self.generate_id();

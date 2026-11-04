@@ -1,44 +1,44 @@
-/// It's time to shift focus: our tickets are doing well, but they need a home.
-/// A place where we can store them, search for them, retrieve them.
+/// 是时候转移重点了：我们的工单运行得不错，但它们需要一个归宿。
+/// 一个可以存储它们、搜索它们、取回它们的地方。
 ///
-/// We can use many different data structures to store and manage our tickets.
-/// JIRA users rely heavily on ticket identifiers, e.g. RUST-2018 or COVID-19.
-/// It's a unique label that unambiguously identifies a single ticket,
-/// generally `<board name>-<ticket number>`.
-/// We don't have the concept of a board yet, so we'll roll with a simple numerical id.
+/// 我们可以使用许多不同的数据结构来存储和管理工单。
+/// JIRA 用户非常依赖工单标识符，例如 RUST-2018 或 COVID-19。
+/// 它是一个唯一的标签，可以明确标识单个工单，
+/// 通常形式为 `<board name>-<ticket number>`。
+/// 我们还没有看板（board）的概念，所以先使用简单的数字 id。
 ///
-/// What is the simplest data structure that allows us to fetch a ticket given its id?
-/// It makes sense for us to use a HashMap, also known as a dictionary in other languages.
-/// You can read more about the HashMap in Rust here:
+/// 允许我们根据 id 获取工单的最简单数据结构是什么？
+/// 对我们来说，使用 HashMap 是合理的，它在其他语言中也称为字典。
+/// 你可以在这里阅读 Rust 中 HashMap 的更多内容：
 /// https://doc.rust-lang.org/std/collections/struct.HashMap.html
 use std::collections::HashMap;
-/// Let's import what we worked on in the previous set of exercises.
+/// 让我们导入上一组练习中完成的内容。
 use super::recap::Ticket;
 
-/// First we will create a TicketStore struct, with a `data` field of type HashMap.
+/// 首先，我们将创建一个 TicketStore 结构体，其中有一个 `data` 字段，类型为 HashMap。
 ///
-/// HashMap is a *generic* struct: we need to specify two types, one for the key, and one for
-/// the stored value - HashMap<K, V>.
+/// HashMap 是一个*泛型*结构体：我们需要指定两个类型，一个用于键，一个用于
+/// 存储的值——HashMap<K, V>。
 ///
-/// Let's set the value type to our Ticket, and we will use an unsigned integer for our ids.
+/// 让我们把值类型设置成我们的 Ticket，并使用无符号整数作为 id。
 struct TicketStore {
-    /// The collection of stored tickets.
+    /// 已存储工单的集合。
     data: HashMap<u32, Ticket>,
 }
 
 impl TicketStore {
-    /// Methods do not have to take self as a parameter.
-    /// This is the equivalent of a class/static method in other programming languages.
-    /// It can be invoked using `TicketStore::new()`.
+    /// 方法不必把 self 作为参数。
+    /// 这等价于其他编程语言中的类方法/静态方法。
+    /// 可以通过 `TicketStore::new()` 调用它。
     pub fn new() -> TicketStore {
         TicketStore {
-            // Note that the compiler can infer the types for our HashMaps' key-value pairs.
+            // 注意，编译器可以推断出我们 HashMap 键值对的类型。
             data: HashMap::new(),
         }
     }
 
-    /// We take `&mut self` because we will have to mutate our HashMap to insert a new
-    /// key-value pair.
+    /// 我们接收 `&mut self`，因为我们将要修改 HashMap，以插入一个新的
+    /// 键值对。
     pub fn save(&mut self, ticket: Ticket, id: u32) {
         todo!()
     }
@@ -54,41 +54,36 @@ mod tests {
     use super::*;
     use fake::{Fake, Faker};
 
-    /// Now let's put our TicketStore to use
+    /// 现在让我们把 TicketStore 用起来。
     ///
-    /// We are going to create a ticket, save it in our TicketStore and finally validate that
-    /// the ticket we have saved in our store is indeed the same ticket we created.
+    /// 我们将创建一个工单，把它保存到 TicketStore 中，最后验证
+    /// 我们保存到存储中的工单确实就是我们创建的那个工单。
     #[test]
     fn a_ticket_with_a_home() {
         let ticket = generate_ticket(Status::ToDo);
 
-        // Pay special attention to the 'mut' keyword here: variables are immutable
-        // by default in Rust.
-        // The `mut` keyword is used to signal that you must pay special attention to the
-        // variable as it's likely to change later on in the function body.
+        // 特别注意这里的 'mut' 关键字：在 Rust 中，变量默认是不可变的。
+        // `mut` 关键字用于表明你必须特别注意这个变量，因为它在
+        // 函数体后面很可能会发生变化。
         let mut store = TicketStore::new();
         let ticket_id = Faker.fake();
 
-        // Here we need to create a clone of our `ticket` because `save` takes the `ticket`
-        // argument as value, thus taking ownership of its value out of the caller function
-        // into the method.
-        // But we need `ticket`'s value after this method call, to verify it matches what
-        // we retrieve.
-        // Hence the need to clone it, creating a copy of the value and passing that copy to
-        // the `save` method.
+        // 这里我们需要创建一个 `ticket` 的克隆，因为 `save` 按值接收 `ticket`
+        // 参数，从而把它的值的所有权从调用者函数转移到方法中。
+        // 但在这个方法调用之后，我们仍然需要 `ticket` 的值，来验证它是否
+        // 与我们取回的内容匹配。
+        // 因此需要克隆它，创建值的一个副本，并把该副本传给 `save` 方法。
         //
-        // (You might have to go back to the `recap` koan to derive a couple more traits
-        // for Ticket and Status...)
+        // （你可能需要回到 `recap` 练习中，为 Ticket 和 Status 派生更多 trait……）
         store.save(ticket.clone(), ticket_id);
 
         assert_eq!(store.get(&ticket_id), &ticket);
     }
 
-    /// We want our `get` method to panic when looking for an id to which there is no ticket
-    /// associated (for now).
+    /// 我们希望 `get` 方法在查找一个没有关联工单的 id 时 panic
+    /// （目前如此）。
     ///
-    /// Rust has a way to handle this failure mode more gracefully, we will take a look
-    /// at it later.
+    /// Rust 有一种更优雅地处理这种失败模式的方式，我们稍后会看一看。
     #[test]
     #[should_panic]
     fn a_missing_ticket() {
@@ -98,8 +93,8 @@ mod tests {
         ticket_store.get(&ticket_id);
     }
 
-    /// This is not our desired behaviour for the final version of the ticket store
-    /// but it will do for now.
+    /// 这不是我们最终版本工单存储所期望的行为，
+    /// 但目前这样就可以了。
     #[test]
     fn inserting_a_ticket_with_an_existing_id_overwrites_previous_ticket() {
         let first_ticket = generate_ticket(Status::ToDo);

@@ -16,19 +16,18 @@ impl TicketStore {
         self.data.insert(id, ticket);
     }
 
-    /// Trying to implement `get` in the previous koan might have caused you some issues due
-    /// to a signature mismatch: `get` on a HashMap returns an `Option<&Ticket>`,
-    /// not a `&Ticket`.
+    /// 在上一练习中尝试实现 `get` 时，你可能会遇到一些问题，
+    /// 原因是签名不匹配：HashMap 上的 `get` 返回的是 `Option<&Ticket>`，
+    /// 而不是 `&Ticket`。
     ///
-    /// What is an Option?
+    /// 什么是 Option？
     ///
-    /// In a nutshell, Rust does not have `null`: if a function returns a `Ticket` there is
-    /// no way for that `Ticket` not to be there.
-    /// If there is indeed the possibility of the function not being able to return a `Ticket`,
-    /// we need to express it in its return type.
-    /// That's where `Option` comes in (`Option` as in `Option`al, or at least that how
-    /// I think about it).
-    /// `Option` is an enum:
+    /// 简而言之，Rust 没有 `null`：如果一个函数返回 `Ticket`，
+    /// 那么这个 `Ticket` 就不可能不存在。
+    /// 如果函数确实有可能无法返回 `Ticket`，
+    /// 我们就需要在返回类型中表达这一点。
+    /// 这正是 `Option` 的用武之地（`Option` 取的是“可选”之意，至少我是这么理解的）。
+    /// `Option` 是一个枚举：
     ///
     /// ```
     /// enum Option<T> {
@@ -36,16 +35,16 @@ impl TicketStore {
     ///     None
     /// }
     /// ```
-    /// `T` is a generic type parameter here: as we saw for HashMap, Rust allows you to be
-    /// generic over the types in your container.
-    /// The `None` variant means that the value is missing.
-    /// The `Some` variant instead tells you that you have a value.
+    /// 这里的 `T` 是一个泛型类型参数：正如我们在 HashMap 中看到的那样，Rust 允许你
+    /// 对容器中的类型进行泛型化。
+    /// `None` 变体表示值缺失。
+    /// 而 `Some` 变体则告诉你，你有一个值。
     ///
-    /// There is no way you can use the value in an `Option` without first checking the variant,
-    /// hence it is impossible to "forget" to handle `None` when writing code.
-    /// The compiler obliges you to handle both the happy and the unhappy case.
+    /// 如果不先检查变体，你就无法使用 `Option` 中的值，
+    /// 因此写代码时不可能“忘记”处理 `None`。
+    /// 编译器会强制你同时处理顺利和不顺利的情况。
     ///
-    /// For more details on `Option`, there is an exhaustive introduction in the Rust book:
+    /// 关于 `Option` 的更多细节，Rust 书中有一篇详尽的介绍：
     /// https://doc.rust-lang.org/1.29.0/book/2018-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values
     pub fn get(&self, id: &u32) -> Option<&Ticket> {
         todo!()
@@ -66,13 +65,13 @@ mod tests {
 
         store.save(ticket.clone(), ticket_id);
 
-        // Notice that, even when a ticket with the specified id exists in the store,
-        // it's returned as the `Some` variant of an `Option<&Ticket>`.
+        // 注意，即使存储中确实存在具有指定 id 的工单，
+        // 它也会作为 `Option<&Ticket>` 的 `Some` 变体返回。
         assert_eq!(store.get(&ticket_id), Some(&ticket));
     }
 
-    /// We want our `get` method to return `None` now, instead of panicking when looking for
-    /// an id to which there is no ticket associated.
+    /// 现在，我们希望 `get` 方法在查找没有关联工单的 id 时返回 `None`，
+    /// 而不是 panic。
     #[test]
     fn a_missing_ticket() {
         let ticket_store = TicketStore::new();

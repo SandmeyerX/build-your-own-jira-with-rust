@@ -1,9 +1,9 @@
 use super::id_generation::TicketId;
 use super::recap::Status;
-/// `chrono` is the go-to crate in the Rust ecosystem when working with time.
-/// `DateTime` deals with timezone-aware datetimes - it takes the timezone as a type parameter.
-/// `DateTime<Utc>` is the type for datetimes expressed in the coordinated universal time.
-/// See:
+/// `chrono` 是 Rust 生态中处理时间的首选 crate。
+/// `DateTime` 用于处理带时区的日期时间——它把时区作为类型参数。
+/// `DateTime<Utc>` 是表示协调世界时（UTC）日期时间的类型。
+/// 参见：
 /// - https://en.wikipedia.org/wiki/Coordinated_Universal_Time
 /// - https://docs.rs/chrono/0.4.11/chrono/
 use chrono::{DateTime, Utc};
@@ -14,13 +14,12 @@ struct TicketStore {
     current_id: TicketId,
 }
 
-/// When we retrieve a ticket we saved, we'd like to receive with it a bunch of metadata:
-/// - the generated id;
-/// - the datetime of its creation.
+/// 当我们取回之前保存的工单时，希望同时拿到一些元数据：
+/// - 生成的 id；
+/// - 它的创建日期时间。
 ///
-/// Make the necessary changes without touching the types of the inputs and the returned
-/// objects in our methods!
-/// You can make inputs mutable, if needed.
+/// 在不改动方法输入类型和返回对象类型的前提下，做出必要的修改！
+/// 如果需要，可以把输入改为可变。
 impl TicketStore {
     pub fn new() -> TicketStore {
         TicketStore {
@@ -65,12 +64,12 @@ impl Ticket {
         &self.status
     }
 
-    // The datetime when the ticket was saved in the store, if it was saved.
+    // 工单保存到存储中时的日期时间（如果已保存）。
     pub fn created_at(&self) -> __ {
         todo!()
     }
 
-    // The id associated with the ticket when it was saved in the store, if it was saved.
+    // 工单保存到存储中时关联的 id（如果已保存）。
     pub fn id(&self) -> __ {
         todo!()
     }
@@ -78,13 +77,13 @@ impl Ticket {
 
 pub fn create_ticket(title: String, description: String, status: Status) -> Ticket {
     if title.is_empty() {
-        panic!("Title cannot be empty!");
+        panic!("标题不能为空！");
     }
     if title.len() > 50 {
-        panic!("A title cannot be longer than 50 characters!");
+        panic!("标题长度不能超过 50 个字符！");
     }
     if description.len() > 3000 {
-        panic!("A description cannot be longer than 3000 characters!");
+        panic!("描述长度不能超过 3000 个字符！");
     }
 
     Ticket {

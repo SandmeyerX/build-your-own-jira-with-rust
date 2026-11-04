@@ -4,41 +4,38 @@ use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::error::Error;
 
-/// The structure of our code is coming along quite nicely: it looks and feels like idiomatic
-/// Rust and it models appropriately the domain we are tackling, JIRA.
+/// 我们代码的结构进展得相当不错：它看起来和感觉上都像地道的 Rust，
+/// 并且恰当地建模了我们正在处理的领域——JIRA。
 ///
-/// There is still something we can improve though: our validation logic when creating a new
-/// draft.
-/// Our previous function, `create_ticket_draft`, panicked when either the title or
-/// the description failed our validation checks.
-/// The caller has no idea that this can happen - the function signature looks quite innocent:
+/// 不过，仍有一些地方可以改进：创建新草稿时的验证逻辑。
+/// 我们之前的函数 `create_ticket_draft` 在标题或描述未通过验证检查时会 panic。
+/// 调用者完全不知道这可能会发生——函数签名看起来相当无害：
 /// ```
 /// pub fn create_ticket_draft(title: String, description: String, status: Status) -> TicketDraft
 /// ```
-/// Panics are generally not "caught" by the caller: they are meant to be used for states
-/// that your program cannot recover from.
+/// 调用者通常不会“捕获” panic：它们旨在用于程序无法恢复的状态。
 ///
-/// For expected error scenarios, we can do a better job using `Result`:
+/// 对于预期内的错误场景，我们可以使用 `Result` 做得更好：
 /// ```
 /// pub fn create_ticket_draft(title: String, description: String, status: Status) -> Result<TicketDraft, ValidationError>
 /// ```
-/// `Result` is an enum defined in the standard library, just like `Option`.
-/// While `Option` encodes the possibility that some data might be missing, `Result`
-/// encodes the idea that an operation can fail.
+/// `Result` 是标准库中定义的枚举，就像 `Option` 一样。
+/// `Option` 编码的是某些数据可能缺失的可能性，而 `Result`
+/// 编码的是操作可能失败这一想法。
 ///
-/// Its definition looks something like this:
+/// 它的定义大致如下：
 /// ```
 /// pub enum Result<T, E> {
 ///     Ok(T),
 ///     Err(E)
 /// }
 /// ```
-/// The `Ok` variant is used to return the outcome of the function if its execution was successful.
-/// The `Err` variant is used to return an error describing what went wrong.
+/// `Ok` 变体用于在函数执行成功时返回其结果。
+/// `Err` 变体用于返回描述出错原因的错误。
 ///
-/// The error type, `E`, has to implement the `Error` trait from the standard library.
-/// Let's archive our old `create_ticket_draft` function and let's define a new
-/// `TicketDraft::new` method returning a `Result` to better set expectations with the caller.
+/// 错误类型 `E` 必须实现标准库中的 `Error` trait。
+/// 让我们归档旧的 `create_ticket_draft` 函数，并定义一个新的
+/// `TicketDraft::new` 方法返回 `Result`，以便更好地向调用者设定预期。
 #[derive(Debug, Clone, PartialEq)]
 pub struct TicketDraft {
     title: String,
@@ -69,22 +66,21 @@ impl TicketDraft {
     }
 }
 
-/// Our error struct, to be returned when validation fails.
-/// It's a wrapper around a string, the validation error message.
-/// Structs without field names are called tuple structs, you can read more about them
-/// in the Rust book:
+/// 我们的错误结构体，在验证失败时返回。
+/// 它是对字符串的包装，即验证错误消息。
+/// 没有字段名的结构体称为元组结构体，你可以在 Rust 书中阅读更多内容：
 /// https://doc.rust-lang.org/book/ch05-01-defining-structs.html#using-tuple-structs-without-named-fields-to-create-different-types
 #[derive(PartialEq, Debug, Clone)]
 pub struct ValidationError(String);
 
-/// To use `ValidationError` as the `Err` variant in a `Result` we need to implement
-/// the `Error` trait.
+/// 要在 `Result` 中把 `ValidationError` 用作 `Err` 变体，我们需要实现
+/// `Error` trait。
 ///
-/// The `Error` trait requires that our struct implements the `Debug` and `Display` traits,
-/// because errors might be bubbled up all the way until they are shown to the end user.
-/// We can derive `Debug`, but `Display` has to be implemented explicitly:
-/// `Display` rules how your struct is printed out for user-facing input, hence it cannot be
-/// derived automatically.
+/// `Error` trait 要求我们的结构体实现 `Debug` 和 `Display` trait，
+/// 因为错误可能会一路向上传播，直到展示给最终用户。
+/// 我们可以派生 `Debug`，但 `Display` 必须显式实现：
+/// `Display` 规定了你的结构体在面向用户的输入中如何打印，因此它不能
+/// 自动派生。
 impl Error for ValidationError {}
 
 impl std::fmt::Display for ValidationError {
@@ -172,7 +168,7 @@ mod tests {
     #[test]
     fn title_cannot_be_longer_than_fifty_chars() {
         let description = (0..3000).fake();
-        // Let's generate a title longer than 51 chars.
+        // 让我们生成一个长度超过 51 个字符的标题。
         let title = (51..10_000).fake();
 
         let result = TicketDraft::new(title, description);

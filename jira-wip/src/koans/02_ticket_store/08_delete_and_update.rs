@@ -4,10 +4,8 @@ use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::error::Error;
 
-/// There are only two pieces missing: deleting a ticket and updating a ticket
-/// in our `TicketStore`.
-/// The update functionality will give us the possibility to change the `status` of
-/// a ticket, the holy grail of our JIRA clone.
+/// 现在只剩下两块拼图了：删除工单，以及在 `TicketStore` 中更新工单。
+/// 更新功能将让我们能够修改工单的 `status`，这是我们 JIRA 克隆版的圣杯。
 struct TicketStore {
     data: HashMap<TicketId, Ticket>,
     current_id: TicketId,
@@ -30,8 +28,8 @@ impl TicketStore {
             description: draft.description,
             status: Status::ToDo,
             created_at: timestamp.clone(),
-            // A new field, to keep track of the last time a ticket has been touched.
-            // It starts in sync with `created_at`, it gets updated when a ticket is updated.
+            // 一个新字段，用于跟踪工单最后一次被触碰的时间。
+            // 它初始时与 `created_at` 同步，在工单被更新时更新。
             updated_at: timestamp,
         };
         self.data.insert(id, ticket);
@@ -46,24 +44,24 @@ impl TicketStore {
         self.data.values().collect()
     }
 
-    /// We take in an `id` and a `patch` struct: this allows us to constrain which of the
-    /// fields in a `Ticket` can actually be updated.
-    /// For example, we don't want users to be able to update the `id` or
-    /// the `created_at` field.
+    /// 我们接收一个 `id` 和一个 `patch` 结构体：这让我们能够约束 `Ticket` 中
+    /// 哪些字段实际上可以被更新。
+    /// 例如，我们不希望用户能够更新 `id` 或
+    /// `created_at` 字段。
     ///
-    /// If we had chosen a different strategy, e.g. implementing a `get_mut` method
-    /// to retrieve a mutable reference to a ticket and give the caller the possibility to edit
-    /// it as they wanted, we wouldn't have been able to uphold the same guarantees.
+    /// 如果我们选择了不同的策略，例如实现一个 `get_mut` 方法
+    /// 来取回工单的可变引用，并让调用者可以随意编辑它，
+    /// 我们就无法维持同样的保证。
     ///
-    /// If the `id` passed in matches a ticket in the store, we return the edited ticket.
-    /// If it doesn't, we return `None`.
+    /// 如果传入的 `id` 与存储中的某个工单匹配，我们返回编辑后的工单。
+    /// 如果不匹配，我们返回 `None`。
     pub fn update(&mut self, id: &TicketId, patch: TicketPatch) -> Option<&Ticket> {
         todo!()
     }
 
-    /// If the `id` passed in matches a ticket in the store, we return the deleted ticket
-    /// with some additional metadata.
-    /// If it doesn't, we return `None`.
+    /// 如果传入的 `id` 与存储中的某个工单匹配，我们返回被删除的工单
+    /// 以及一些额外的元数据。
+    /// 如果不匹配，我们返回 `None`。
     pub fn delete(&mut self, id: &TicketId) -> Option<DeletedTicket> {
         todo!()
     }
@@ -74,13 +72,13 @@ impl TicketStore {
     }
 }
 
-/// We don't want to relax our constraints on what is an acceptable title or an acceptable
-/// description for a ticket.
-/// This means that we need to validate the `title` and the `description` in our `TicketPatch`
-/// using the same rules we use for our `TicketDraft`.
+/// 我们不想放宽对工单可接受的标题或可接受的
+/// 描述的约束。
+/// 这意味着我们需要使用与 `TicketDraft` 相同的规则
+/// 来验证 `TicketPatch` 中的 `title` 和 `description`。
 ///
-/// To keep it DRY, we introduce two new types whose constructors guarantee the invariants
-/// we care about.
+/// 为了保持 DRY（不重复自己），我们引入两个新类型，其构造函数保证我们
+/// 关心的不变量。
 #[derive(Debug, Clone, PartialEq)]
 pub struct TicketTitle(String);
 
@@ -113,10 +111,10 @@ impl TicketDescription {
     }
 }
 
-/// `TicketPatch` constrains the fields that we consider editable.
+/// `TicketPatch` 约束了我们认为是可编辑的字段。
 ///
-/// If a field is set the `Some`, its value will be updated to the specified value.
-/// If a field is set to `None`, the field remains unchanged.
+/// 如果某个字段被设置为 `Some`，它的值将被更新为指定的值。
+/// 如果某个字段被设置为 `None`，该字段保持不变。
 #[derive(Debug, Clone, PartialEq)]
 pub struct TicketPatch {
     pub title: Option<TicketTitle>,
@@ -124,24 +122,22 @@ pub struct TicketPatch {
     pub status: Option<Status>,
 }
 
-/// With validation baked in our types, we don't have to worry anymore about the visibility
-/// of those fields.
-/// Our `TicketPatch` and our `TicketDraft` don't have an identity, an id, like a `Ticket`
-/// saved in the store.
-/// They are value objects, not entities, to borrow some terminology from Domain Driven Design.
+/// 由于验证已经内建在我们的类型中，我们不再需要担心这些字段的可见性。
+/// 我们的 `TicketPatch` 和 `TicketDraft` 没有身份标识，没有 id，不像保存在存储中的
+/// `Ticket`。
+/// 借用领域驱动设计（Domain Driven Design）的术语来说，它们是值对象，而不是实体。
 ///
-/// As long as we know that our invariants are upheld, we can let the user modify them
-/// as much as they please.
-/// We can thus get rid of the constructor and all the accessor methods. Pretty sweet, uh?
+/// 只要我们已知我们的不变量得到维持，我们就可以让用户随意修改它们。
+/// 因此我们可以去掉构造函数和所有访问器方法。相当不错吧？
 #[derive(Debug, Clone, PartialEq)]
 pub struct TicketDraft {
     pub title: TicketTitle,
     pub description: TicketDescription,
 }
 
-/// A light wrapper around a deleted ticket to store some metadata (the deletion timestamp).
-/// If we had a user system in place, we would also store the identity of the user
-/// who performed the deletion.
+/// 一个围绕被删除工单的轻量包装，用于存储一些元数据（删除时间戳）。
+/// 如果我们有用户系统，我们还会存储
+/// 执行删除操作的用户身份。
 #[derive(Debug, Clone, PartialEq)]
 pub struct DeletedTicket {
     ticket: Ticket,
@@ -239,8 +235,8 @@ mod tests {
         let patch = generate_ticket_patch(Status::Done);
         let ticket_id = store.save(draft.clone());
 
-        // Let's wait a bit, otherwise `created_at` and `updated_at`
-        // might turn out identical (ᴗ˳ᴗ)
+        // 让我们等一会儿，否则 `created_at` 和 `updated_at`
+        // 可能会变得相同 (ᴗ˳ᴗ)
         std::thread::sleep(Duration::from_millis(100));
         let updated_ticket = store.update(&ticket_id, patch.clone()).unwrap();
 
@@ -308,7 +304,7 @@ mod tests {
 
     #[test]
     fn title_cannot_be_longer_than_fifty_chars() {
-        // Let's generate a title longer than 51 chars.
+        // 让我们生成一个长度超过 51 个字符的标题。
         let title = (51..10_000).fake();
 
         assert!(TicketTitle::new(title).is_err())

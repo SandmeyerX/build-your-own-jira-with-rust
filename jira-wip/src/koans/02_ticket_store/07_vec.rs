@@ -4,10 +4,10 @@ use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::error::Error;
 
-/// Let's turn our attention again to our `TicketStore`.
-/// We can create a ticket, we can retrieve a ticket.
+/// 让我们再次把注意力转向 `TicketStore`。
+/// 我们可以创建工单，也可以取回工单。
 ///
-/// Let's implement a `list` method to retrieve all tickets currently in the store.
+/// 让我们实现一个 `list` 方法，用来取回当前存储中的所有工单。
 struct TicketStore {
     data: HashMap<TicketId, Ticket>,
     current_id: TicketId,
@@ -38,9 +38,9 @@ impl TicketStore {
         self.data.get(id)
     }
 
-    /// List will return a `Vec`.
-    /// Check the Rust book for a primer: https://doc.rust-lang.org/book/ch08-01-vectors.html
-    /// The Rust documentation for `HashMap` will also be handy:
+    /// `list` 将返回一个 `Vec`。
+    /// 查看 Rust 书中的入门介绍：https://doc.rust-lang.org/book/ch08-01-vectors.html
+    /// `HashMap` 的 Rust 文档也会很有用：
     /// https://doc.rust-lang.org/std/collections/struct.HashMap.html
     pub fn list(&self) -> Vec<&Ticket> {
         todo!()
@@ -170,7 +170,7 @@ mod tests {
     #[test]
     fn title_cannot_be_longer_than_fifty_chars() {
         let description = (0..3000).fake();
-        // Let's generate a title longer than 51 chars.
+        // 让我们生成一个长度超过 51 个字符的标题。
         let title = (51..10_000).fake();
 
         let result = TicketDraft::new(title, description);
