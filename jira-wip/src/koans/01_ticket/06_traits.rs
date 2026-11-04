@@ -55,7 +55,11 @@ impl PartialEq for Status {
         // 如果你需要复习 `match` 语法，请查看
         // https://doc.rust-lang.org/book/ch06-02-match.html
         match (self, other) {
-            __
+            (Status::ToDo, Status::ToDo) => true,
+            (Status::InProgress, Status::InProgress) => true,
+            (Status::Blocked, Status::Blocked) => true,
+            (Status::Done, Status::Done) => true,
+            _ => false,
         }
     }
 }

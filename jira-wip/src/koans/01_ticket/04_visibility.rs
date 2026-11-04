@@ -19,20 +19,20 @@ pub mod ticket {
     /// （例如 `create_ticket` 可以通过指定字段来创建 `Ticket`）。
     /// 在模块之外，这些字段不可访问，因为默认情况下它们被视为私有，
     /// 除非带有 `pub` 前缀。
-    enum Status {
+    pub enum Status {
         ToDo,
         InProgress,
         Blocked,
         Done,
     }
 
-    struct Ticket {
+    pub struct Ticket {
         title: String,
         description: String,
         status: Status,
     }
 
-    fn create_ticket(title: String, description: String, status: Status) -> Ticket {
+    pub fn create_ticket(title: String, description: String, status: Status) -> Ticket {
         if title.is_empty() {
             panic!("Title cannot be empty!");
         }
@@ -75,7 +75,7 @@ mod tests {
         //
         // 一旦你确认下面这行无法编译，
         // 就把它注释掉，以便继续下一个 koan！
-        assert_eq!(ticket.description, "A description");
+        // assert_eq!(ticket.description, "A description");
     }
 
     fn encapsulation_cannot_be_violated() {
@@ -88,10 +88,10 @@ mod tests {
         //
         // 一旦你确认下面这些代码无法编译，
         // 就把它们注释掉，以便继续下一个 koan！
-        let ticket = Ticket {
-            title: "A title".into(),
-            description: "A description".into(),
-            status: Status::ToDo,
-        };
+        // let ticket = Ticket {
+        //     title: "A title".into(),
+        //     description: "A description".into(),
+        //     status: Status::ToDo,
+        // };
     }
 }

@@ -18,7 +18,7 @@
 /// ```
 ///
 /// PartialEq 并不是唯一可以自动派生实现的 trait！
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Status {
     ToDo,
     InProgress,

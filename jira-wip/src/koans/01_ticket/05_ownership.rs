@@ -69,12 +69,12 @@ impl Ticket {
     /// 把 __ 替换为合适的类型，为另外两个字段获得访问器方法。
     /// 如果你在想为什么我们返回 &str 而不是 &String，请查看：
     /// https://blog.thoughtram.io/string-vs-str-in-rust/
-    pub fn description(__) -> __ {
-        todo!()
+    pub fn description(&self) -> &String {
+        &self.description
     }
 
-    pub fn status(__) -> __ {
-       todo!()
+    pub fn status(&self) -> &Status {
+       &self.status
     }
 }
 
