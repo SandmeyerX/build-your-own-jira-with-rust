@@ -56,14 +56,30 @@ impl TicketStore {
     /// 如果传入的 `id` 与存储中的某个工单匹配，我们返回编辑后的工单。
     /// 如果不匹配，我们返回 `None`。
     pub fn update(&mut self, id: &TicketId, patch: TicketPatch) -> Option<&Ticket> {
-        todo!()
+        let ticket = self.data.get_mut(id)?;
+
+        if let Some(title) = patch.title {
+            ticket.title = title;
+        }
+        if let Some(description) = patch.description {
+            ticket.description = description;
+        }
+        if let Some(status) = patch.status {
+            ticket.status = status;
+        }
+        ticket.updated_at = Utc::now();
+
+        Some(ticket)
     }
 
     /// 如果传入的 `id` 与存储中的某个工单匹配，我们返回被删除的工单
     /// 以及一些额外的元数据。
     /// 如果不匹配，我们返回 `None`。
     pub fn delete(&mut self, id: &TicketId) -> Option<DeletedTicket> {
-        todo!()
+        self.data.remove(id).map(|ticket| DeletedTicket {
+            ticket,
+            deleted_at: Utc::now(),
+        })
     }
 
     fn generate_id(&mut self) -> TicketId {
