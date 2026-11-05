@@ -56,3 +56,9 @@ pub mod store_recap;
 #[path = "koans/03_cli/00_cli.rs"]
 pub mod cli;
 
+#[path = "koans/03_cli/01_persistence.rs"]
+pub mod persistence;
+
+#[path = "koans/03_cli/02_the_end.rs"]
+mod the_end;
+

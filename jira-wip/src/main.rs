@@ -21,11 +21,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut ticket_store = TicketStore::new();
 
     // Uncomment these lines after 03_cli/01_persistence
-    /*
-        use path_to_enlightenment::persistence::{save, load};
-        // Load the store from disk. If missing, a brand new one will be created.
-        let mut ticket_store = load(&data_store_filename());
-    */
+    use path_to_enlightenment::persistence::{save, load};
+    // Load the store from disk. If missing, a brand new one will be created.
+    let mut ticket_store = load(&data_store_filename());
 
     // Uncomment these lines after 03_cli/00_cli
     use path_to_enlightenment::cli::{Command, handle_command};
@@ -34,10 +32,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     handle_command(&mut ticket_store, command)?;
 
     // Uncomment these lines after 03_cli/01_persistence
-    /*
         // Save the store state to disk after we have completed our action.
-        save(&ticket_store, &data_store_filename());
-    */
+    save(&ticket_store, &data_store_filename());
+
     Ok(())
 }
 
